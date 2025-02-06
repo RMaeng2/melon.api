@@ -1,0 +1,35 @@
+name: Update README with Top Songs
+
+on:
+  schedule:
+    - cron: "0 12 * * *"  # 매일 정오 실행
+  workflow_dispatch:
+
+jobs:
+  update-music:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Fetch Top Songs
+        env:
+          SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID }}
+          SPOTIFY_CLIENT_SECRET: ${{ secrets.SPOTIFY_CLIENT_SECRET }}
+        run: |
+          TOKEN=$(curl -s -X POST "https://accounts.spotify.com/api/token" -d "grant_type=client_credentials" -u "$SPOTIFY_CLIENT_ID:$SPOTIFY_CLIENT_SECRET" | jq -r '.access_token')
+          curl -s -X GET "https://api.spotify.com/v1/browse/featured-playlists" -H "Authorization: Bearer $TOKEN" | jq -r '.playlists.items[:5] | map("- " + .name + " (" + .external_urls.spotify + ")") | join("\n")' > songs.txt
+
+      - name: Update README
+        run: |
+          echo "### 🎵 인기 있는 플레이리스트" > README.md
+          cat songs.txt >> README.md
+          echo "\n_Last updated: $(date)_" >> README.md
+
+      - name: Commit changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add README.md
+          git commit -m "Update README with top Spotify playlists" || echo "No changes to commit"
+          git push
