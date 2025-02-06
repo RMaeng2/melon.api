@@ -27,10 +27,6 @@ jobs:
         run:
           python rank_spotify.py
 
-      - name: Update README
-        run: |
-          cat top_songs.md > README.md
-
       - name: Commit changes
         run: |
           git config --global user.name "github-actions[bot]"
