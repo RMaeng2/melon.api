@@ -41,7 +41,7 @@ html_content = f"""
 """
 
 # 파일 저장
-with open("readme.md", "w", encoding="utf-8") as f:
+with open("README.md", "w", encoding="utf-8") as f:
     f.write(html_content)
 
 print("readme.md 파일이 생성되었습니다.")
