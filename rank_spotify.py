@@ -10,8 +10,9 @@ CLIENT_SECRET = os.getenv("SPOTIFY_CLIENT_SECRET")
 def get_spotify_token():
     url = "https://accounts.spotify.com/api/token"
     headers = {
-        "Authorization": "Basic " + base64.b64encode(f"{CLIENT_ID}:{CLIENT_SECRET}".encode()).decode()
-    }
+    "Authorization": "Basic " + base64.b64encode(f"{CLIENT_ID}:{CLIENT_SECRET}".encode()).decode(),
+    "Content-Type": "application/x-www-form-urlencoded"
+}
     data = {"grant_type": "client_credentials"}
     response = requests.post(url, headers=headers, data=data)
     return response.json().get("access_token")
@@ -22,7 +23,7 @@ def get_top_songs():
     url = "https://api.spotify.com/v1/browse/featured-playlists"
     headers = {"Authorization": f"Bearer {token}"}
     response = requests.get(url, headers=headers)
-        
+
     playlists = response.json().get("playlists", {}).get("items", [])
     top_songs = []
     
